@@ -1,0 +1,128 @@
+\documentclass{article}
+
+\newcommand{\obs}{\mathrm{obs}}
+\newcommand{\aper}{\mathrm{aper}}
+\newcommand{\aperin}{\mathrm{aper\_in}}
+\newcommand{\aperout}{\mathrm{aper\_out}}
+\newcommand{\true}{\mathrm{true}}
+\newcommand{\bkgoffset}{\varepsilon}
+\newcommand{\ZP}{\mathrm{ZP}}
+
+\begin{document}
+\title{Background Offsets from Aperture Fluxes}
+\author{Eli S. Rykoff}
+
+\section{Estimating Background Offsets}
+
+What is the effect of an additive background offset on photometric
+measurements?  I believe the equations here have been worked out by others
+(e.g. Evans et al. 2018), but I have not seen them written explicitly or in
+this detail.
+
+Let us assume we have a constant background offset which is small, so we will
+call it $\bkgoffset$.  This will be measured either in instrumental units
+($\mathrm{ADU}/\mathrm{pixel}^2$) or in physical units
+($\mathrm{nJy}/\mathrm{arcsec}^2$).
+
+The observed aperture magnitude including an extra background contribution is:
+%
+\begin{equation}
+  m_\aper^\obs = \ZP - 2.5\log_{10}(f_\aper^\true + \pi r_\aper^2 \bkgoffset),
+\end{equation}
+%
+where $m_\aper^\obs$ is the observed aperture magnitude, $\ZP$ is an arbitrary zeropoint, and
+$f_\aper^\true$ is the true aperture flux of the object.  We can split this
+into two components:
+%
+\begin{eqnarray}
+  m_\aper^\obs &=& \ZP - 2.5\log_{10}\left [ f_\aper^\true \left ( 1 + \frac{\pi
+      r_\aper^2 \bkgoffset}{f_\aper^\true} \right ) \right ]\\
+  &=& \ZP - 2.5\log_{10}f_\aper^\true - 2.5\log_{10} \left ( 1 + \frac{\pi
+    r_\aper^2 \bkgoffset}{f_\aper^\true} \right ).
+\end{eqnarray}
+%
+Assuming that $\bkgoffset$ is small (specifically, $\frac{\pi r^2
+  \bkgoffset}{f} \ll 1$), then we have:
+%
+\begin{equation}
+  m_\aper^\obs \approx \ZP - 2.5\log_{10}f_\aper^\true - \frac{k \pi
+    r_\aper^2 \bkgoffset}{f_\aper^\true},
+\end{equation}
+%
+where $k \equiv 2.5/\ln(10)$.
+
+The impact of the background offset is thus a \emph{flux}-dependent offset in
+\emph{magnitude}.  This is breaking the assumption that all the variations that
+we see (due to system throughput, or ratio of stellar flux with different
+apertures) are multiplicative in flux and thus additive in magnitude.
+
+Of course, with a single star or even a set of stars with a single magnitude
+measurement we could not isolate the effect of the background offset.  By
+\emph{comparing} aperture magnitudes we can.  There are a few implicit
+assumptions in what follows.  First of all, we must use apertures that are
+large enough to avoid any variations in the core of the psf, which we expect
+varies more rapidly spatially than the outer wings of the psf.  Second, any
+spatial variations in the wings of the psf should not be correlated with flux
+(that is, the bright and faint stars are not segregated by psf size).
+
+Now taking the difference between a two large apertures, which we call
+$\aperin$ (with radius $r_{\mathrm{in}}$) and $\aperout$ (with radius
+$r_{\mathrm{out}}$):
+%
+\begin{eqnarray}
+  m_\aperin^\obs - m_\aperout^\obs &=& \ZP - 2.5\log_{10}f_\aperin^\true -
+  \frac{k \pi r_{\mathrm{in}}^2 \bkgoffset}{f_\aperin^{\true}}\\
+  &&- \ZP +
+  2.5\log_{10}f_\aperout^\true + \frac{k \pi r_{\mathrm{out}}^2
+    \bkgoffset}{f_\aperout^{\true}}
+\end{eqnarray}
+%
+\begin{eqnarray}
+  m_\aperin^\obs - m_\aperout^\obs &=& -2.5\log_{10}f_\aperin^\true +
+  2.5\log_{10}f_\aperout^\true\\
+  && + \frac{k \pi r_{\mathrm{out}}^2 \bkgoffset}{f_\aperout^\true} - \frac{k \pi
+    r_{\mathrm{in}}^2 \bkgoffset}{f_\aperin^\true}.
+\end{eqnarray}
+
+For a constant PSF, the difference between the inner and outer true flux will
+be a simple multiplicative factor, $c$, which we define such that:
+\begin{equation}
+  f_\aperout^\true \equiv c f_\aperin^\true.
+\end{equation}
+
+Splitting this out, we get:
+%
+\begin{eqnarray}
+  m_\aperin^\obs - m_\aperout^\obs &=& -2.5\log_{10}f_\aperin^\true +
+  2.5\log_{10}(c f_\aperin^\true)\\
+  && + \frac{k \pi r_{\mathrm{out}}^2 \bkgoffset}{c f_\aperin^\true} - \frac{k
+    \pi r_{\mathrm{in}}^2 \bkgoffset}{f_\aperin^\true}.
+\end{eqnarray}
+%
+\begin{eqnarray}
+  m_\aperin^\obs - m_\aperout^\obs &=& 2.5\log_{10}c\\
+  && + \frac{1}{c}\left [ \frac{k \pi r_{\mathrm{out}}^2
+      \bkgoffset}{f_\aperin^\true} - \frac{c k \pi r_{\mathrm{in}}^2
+      \bkgoffset}{f_\aperin^\true} \right ].
+\end{eqnarray}
+
+In the end, this becomes:
+\begin{equation}
+  m_\aperin^\obs - m_\aperout^\obs = 2.5\log_{10}c + \frac{k \pi \bkgoffset
+    (r_{\mathrm{out}}^2 - c r_{\mathrm{in}}^2)}{c} \frac{1}{f_\aperin^\true}.
+\end{equation}
+%
+Thus, for a sample of stars that share a background offset, there is a linear
+relation between $m_\aperin^\obs - m_\aperout^\obs$ and $1/f_\aperin^\true$,
+where the slope depends on known aperture radii, the unknown $\bkgoffset$, and
+the flux ratio $c$.
+
+In practice, we fit the linear relation assuming $c=1.0$, use the y-intercept
+to recover $c$ (which for typical apertures used is on the order of $1.01 -
+1.02$), and refit fixing the value of $c$.  At the moment we assume that the
+effect of using $f_\aperin^\obs$ as an estimate of $f_\aperin^\true$ for the
+purposes of the fit, but we could in principle estimate $f_\aperin^\true$ from
+the initial fit.
+
+
+\end{document}
